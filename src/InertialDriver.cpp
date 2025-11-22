@@ -62,18 +62,25 @@ void InertialDriver::clear_buffer() {
 
  // dalla misura più recente, restituisce una delle 17 letture (composte da i 6 double)
 Reading InertialDriver::get_reading(int sensor_index) const {
+    // crea una variabile Measure
     Measure newest;
+    // attraverso una serie di if trovo quale è l'ultima misura registrata nell'array
+    // se gli elementi nell'array sono meno della massima dimensione, l'ultimo elemento insertio è buffer[firstFreeIndex-1]
     if (elem_count != BUFFER_DIM){
         newest = buffer[firstFreeIndex-1];
     }
+    // se l'array contiene il massimo di elementi, e il primo elemento non si trova a buffer[0], l'utlimo elemento inserito è buffer[oldestMeasureIndex-1]
     else if (oldestMeasureIndex != 0) {
         newest = buffer[oldestMeasureIndex-1];
     }
+    // se l'array contiene il massimo di elementi, ma l'elemento più vecchio è a buffer[0], l'utlimo elemento inserito è buffer[BUFFER_DIM]
     else {
         newest = buffer[BUFFER_DIM];
     }
+    // creo un oggetto reading e lo iniziallizzo all'elemento sensor_index dell'oggetto Measure newest
     Reading rtrn = newest[sensor_index];
-    
+
+    //ritorno la lettura rtrn
     return rtrn;
 }
 
