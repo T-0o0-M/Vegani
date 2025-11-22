@@ -54,12 +54,27 @@ Measure InertialDriver::pop_front() {
 
  // setta il buffer vuoto
 void InertialDriver::clear_buffer() {
-    
+     // resetta tutti gli indici come se si fosse appena creato un oggetto InertialDriver
+    firstFreeIndex = 0;
+    oldestMeasureIndex = 0;
+    elem_count = 0;   
 }
 
  // dalla misura più recente, restituisce una delle 17 letture (composte da i 6 double)
 Reading InertialDriver::get_reading(int sensor_index) const {
+    Measure newest;
+    if (elem_count != BUFFER_DIM){
+        newest = buffer[firstFreeIndex-1];
+    }
+    else if (oldestMeasureIndex != 0) {
+        newest = buffer[oldestMeasureIndex-1];
+    }
+    else {
+        newest = buffer[BUFFER_DIM];
+    }
+    Reading rtrn = newest[sensor_index];
     
+    return rtrn;
 }
 
 //overloead operatore <<
