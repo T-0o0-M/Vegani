@@ -75,7 +75,7 @@ Reading InertialDriver::get_reading(int sensor_index) const {
     }
     // se l'array contiene il massimo di elementi, ma l'elemento più vecchio è a buffer[0], l'utlimo elemento inserito è buffer[BUFFER_DIM]
     else {
-        newest = buffer[BUFFER_DIM];
+        newest = buffer[BUFFER_DIM-1];
     }
     // creo un oggetto reading e lo iniziallizzo all'elemento sensor_index dell'oggetto Measure newest
     Reading rtrn = newest[sensor_index];
