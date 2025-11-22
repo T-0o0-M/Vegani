@@ -5,7 +5,7 @@
 #include <iostream>
 
 // dimensione buffer arbitraria
-const int BUFFER_DIM = 9; 
+const int BUFFER_DIM=9; 
 
 // una lettura è composta da 6 valori
 struct Reading {
@@ -52,6 +52,9 @@ public:
     // Se sensor_index è fuori dall'intervallo [0,16], il comportamento dipende dall'implementazione:
     // può generare un'eccezione, restituire una lettura di default, o causare un errore di runtime.
     Reading get_reading(int sensor_index) const;
+
+    //funzione utilizzata per rapidamente incrementare gli indici
+    //void indexes_Increment();
 
     // Overload operator<< print misura più recente (non testato)
     friend std::ostream& operator<<(std::ostream& os, const InertialDriver& driver);

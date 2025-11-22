@@ -7,46 +7,75 @@ InertialDriver::InertialDriver() {
     firstFreeIndex = 0;
     oldestMeasureIndex = 0;
     elem_count = 0;
+    buffer.reserve(BUFFER_DIM);
+/*utilizzo degli indici:
+first e oldest vengono utilizzati per il loro significato letterare
+per individuare se buffer è pieno o vuoto è necessario utilizzare elem_count*/    
 }
 
+
+//FUNZIONE USATA PER SEMPLIFICARE PUSH_BACK RIMOSSA
 //incrementa gli indici dinamicamente attorno alla max size di 9
- void InertialDriver::index_Increment(){
+/*
+ void InertialDriver::indexes_Increment(){
+if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;}
+    if(oldestMeasureIndex < (BUFFER_DIM-1)){oldestMeasureIndex++;}
 
-    if(firstFreeIndex < 8){firstFreeIndex++;}
-    if(oldestMeasureIndex < 8){oldestMeasureIndex++;}
-
-    if(firstFreeIndex == 8){firstFreeIndex == 0;}
-    if(oldestMeasureIndex == 8){oldestMeasureIndex == 0;}
- }
+    if(firstFreeIndex == (BUFFER_DIM-1)){firstFreeIndex == 0;}
+    if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex == 0;
+    }
+ }*/
 
 // aggiungi una misura; se il buffer è pieno, sovrascrive la misura più vecchia
 void InertialDriver::push_back(const Measure& m) {
-    //dato che myvector è una classe di gestione dinamica
-    //lasciamo il buffer crescere fino alla sua dimensione massima consentita
-    //e solo dopo che sono stati salvati i primi 9 valori utilizziamo gli index circolari
+//CODICE DEPRECATO
+//LA SIZE DEL BUFFER VIENE RISERVATA NEL COSTRUTTORE
+//CODICE COMMENTATO E' INUTILE MA LO LASCIO PK NON SI SA MAI          
+         //dato che myvector è una classe di gestione dinamica
+         //lasciamo il buffer crescere fino alla sua dimensione massima consentita
+         //e solo dopo che sono stati salvati i primi 9 valori utilizziamo gli index circolari
 
-    //caso in cui il buffer non abbai ancora ricevuto i primi 9 valori
-    if (buffer.size() < BUFFER_DIM){
-    buffer.push_back(m);
+         //caso in cui il buffer non abbai ancora ricevuto i primi 9 valori
+    
+               //if (buffer.size() < BUFFER_DIM){
+               //buffer.push_back(m);
+               //elem_count++;
+         //semplice implementazione utilizzando la classe myVector
+         //eleem_count è provvisiorio nel caso sia inutile lo tolgo
+ // }
+         //caso in cui siamo arrivati ai primi 9
+         //iniziamo ad utilizziare gli index
+  //IF COMMENATTO PK BUFFER SIZE COSTANTE
+         //if (buffer.size() == BUFFER_DIM)
+         //siamo nel caso in cui NON possiamo più permettere al buffer di crescere in size
+         //allora utiliziamo gli index
+    
 
-    elem_count++;
-    //semplice implementazione utilizzando la classe myVector
-    //eleem_count è provvisiorio nel caso sia inutile lo tolgo
-  }
-  //caso in cui siamo arrivati ai primi 9
-  //iniziamo ad utilizziare gli index
-   if (buffer.size() == BUFFER_DIM){
-    //siamo nel caso in cui NON possiamo più permettere al buffer di crescere in size
-    //allora utiliziamo gli index
+   //implementazione con buffer.reserve e elem_count
+   //caso buffer non vuoto
+    if(elem_count > 0){
+    //CONVENZIONE PRIMA SI USA L'INDICE POI LO SI MODIDICA
     buffer[firstFreeIndex] = m;
-    index_Increment();
+    elem_count++;
+
+    if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;}
+    if(oldestMeasureIndex < (BUFFER_DIM-1)){oldestMeasureIndex++;}
+
+    if(firstFreeIndex == (BUFFER_DIM-1)){firstFreeIndex == 0;}
+    if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex == 0;}
+   }
+   //caso buffer vuoto
+    if(elem_count == 0){
+      buffer[0]= m;
+      firstFreeIndex++;
+      elem_count++;
    }
 }
 
 // fornisce e rimuove misura più vecchia
 Measure InertialDriver::pop_front() {
    Measure rtrn = buffer[oldestMeasureIndex];
-   if(oldestMeasureIndex == 0){oldestMeasureIndex = 8;}
+   if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex = (BUFFER_DIM-1);}
    if(oldestMeasureIndex > 0){oldestMeasureIndex--;}
    elem_count--;
    return rtrn;
