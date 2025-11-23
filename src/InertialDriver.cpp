@@ -116,5 +116,17 @@ Reading InertialDriver::get_reading(int sensor_index) const {
 
 //overloead operatore <<
 std::ostream& operator<<(std::ostream& os, const InertialDriver& driver) {
-  
+    for ( int i = 0; i < 17; i++ ){
+        Reading temp = driver.get_reading( i );
+
+        os << "[" << temp.pitch_a << "," << temp.pitch_v << "," 
+            << temp.roll_a << "," << temp.roll_v << "," 
+            << temp.yaw_a << "," << temp.yaw_v << "]";
+
+        if ( i < 16 ){
+            os << ",";
+        }
+    }
+
+    return os;
 }
