@@ -55,28 +55,43 @@ void InertialDriver::push_back(const Measure& m) {
    //caso buffer non vuoto
     if(elem_count > 0){
     //CONVENZIONE PRIMA SI USA L'INDICE POI LO SI MODIDICA
-    buffer[firstFreeIndex] = m;
-    elem_count++;
-
-    if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;}
+    //buffer[firstFreeIndex] = m;
+    if (elem_count < BUFFER_DIM){elem_count++;}
+    //-----CASO INDICI DIVERSI-----
+    if(firstFreeIndex != oldestMeasureIndex){
+        buffer[firstFreeIndex] = m;
+        if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;}
+        if(firstFreeIndex == (BUFFER_DIM-1)){firstFreeIndex == 0;}
+    }
+    //---CASO INDICI UGUALI (SOVRASCRITTURA)
+    if(firstFreeIndex == oldestMeasureIndex){
+        buffer[oldestMeasureIndex] = m;
+        if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;oldestMeasureIndex++;}
+        if(firstFreeIndex == (BUFFER_DIM-1)){firstFreeIndex = 0;oldestMeasureIndex = 0;}   
+    }
+    /*if(firstFreeIndex < (BUFFER_DIM-1)){firstFreeIndex++;}
     if(oldestMeasureIndex < (BUFFER_DIM-1)){oldestMeasureIndex++;}
 
     if(firstFreeIndex == (BUFFER_DIM-1)){firstFreeIndex == 0;}
     if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex == 0;}
+    */
    }
    //caso buffer vuoto
     if(elem_count == 0){
       buffer[0]= m;
       firstFreeIndex++;
-      elem_count++;
-   }
+      elem_count++;   
+    }
 }
 
 // fornisce e rimuove misura più vecchia
 Measure InertialDriver::pop_front() {
+    if(elem_count == 0){
+        throw std::out_of_range("Errore: Buffer vuoto");
+    }
    Measure rtrn = buffer[oldestMeasureIndex];
-   if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex = (BUFFER_DIM-1);}
-   if(oldestMeasureIndex > 0){oldestMeasureIndex--;}
+  if(oldestMeasureIndex < (BUFFER_DIM-1)){oldestMeasureIndex++;}
+  if(oldestMeasureIndex == (BUFFER_DIM-1)){oldestMeasureIndex == 0;}
    elem_count--;
    return rtrn;
 }
@@ -91,8 +106,12 @@ void InertialDriver::clear_buffer() {
 
 
  // dalla misura più recente, restituisce una delle 17 letture (composte da i 6 double)
-Reading InertialDriver::get_reading(int sensor_index) const {
+ //aggiunto & per restituire per valore, const per proteggere il buffer
+const Reading& InertialDriver::get_reading(int sensor_index) const {
     // crea una variabile Measure
+    if(elem_count == 0){
+        throw std::out_of_range("Errore: Buffer vuoto");
+    }
     Measure newest;
     // attraverso una serie di if trovo quale è l'ultima misura registrata nell'array
     // se gli elementi nell'array sono meno della massima dimensione, l'ultimo elemento insertio è buffer[firstFreeIndex-1]
@@ -116,5 +135,17 @@ Reading InertialDriver::get_reading(int sensor_index) const {
 
 //overloead operatore <<
 std::ostream& operator<<(std::ostream& os, const InertialDriver& driver) {
-  
+    for ( int i = 0; i < 17; i++ ){
+        Reading temp = driver.get_reading( i );
+
+        os << "[" << temp.pitch_a << "," << temp.pitch_v << "," 
+            << temp.roll_a << "," << temp.roll_v << "," 
+            << temp.yaw_a << "," << temp.yaw_v << "]";
+
+        if ( i < 16 ){
+            os << ",";
+        }
+    }
+
+    return os;
 }
