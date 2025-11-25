@@ -4,10 +4,10 @@
 #include "myVector.h"
 #include <iostream>
 
-// dimensione buffer arbitraria
+// Dimensione buffer arbitraria
 const int BUFFER_DIM=9; 
 
-// una lettura è composta da 6 valori
+// Reading e' una singola lettura composta da 6 valori come double 
 struct Reading {
     double yaw_v;
     double yaw_a;
@@ -17,32 +17,30 @@ struct Reading {
     double roll_a;
 };
 
-// una misura sono 17 letture 
-// così è un doppio struct, Measure contiene Reading che contiene 6 double
+// Measure contiene un array stile C composto da 17 letture
 struct Measure {
-    // array stile c di 17 letture
     Reading sensors[17]; 
 };
 
 class InertialDriver {
 private:
-    // il buffer lo usiamo con myvector, dimensione fissata da BUFFER_DIM
+    // Buffer implementato attraverso classe myVector
     myVector<Measure> buffer;
     
-    // Index del primo slot libero
+    // Indice del primo slot libero nel buffer
     int firstFreeIndex;
     // Indice della misura meno recente
     int oldestMeasureIndex;
-    //numero attuale di elementi per doppio controllo
+    // Numero attuale di elementi nel Buffer
     int elem_count;
 
 public:
     InertialDriver();
 
-    // aggiungi una misura; se il buffer è pieno, sovrascrive la misura più vecchia
+    // Aggiunge una misura. Se il buffer è pieno, sovrascrive la misura più vecchia
     void push_back(const Measure& m);
 
-    // fornisce e rimuove misura più vecchia
+    // Restituisce e rimuove dal buffer la misura meno recente
     Measure pop_front();
 
     // setta il buffer vuoto
