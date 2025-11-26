@@ -27,7 +27,7 @@ int main(){
     Measure m4;
     Measure m5;
     
-    for( int i = 0; i < 17; i ++ ){
+    for( int i = 0; i < MEASURE_DIM; i ++ ){
         m1.sensors[ i ] = r1;
         m2.sensors[ i ] = r2;
         m3.sensors[ i ] = r3;

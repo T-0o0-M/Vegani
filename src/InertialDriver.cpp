@@ -1,6 +1,3 @@
-#ifndef INERTIALDRIVER_HPP
-#define INERTIALDRIVER_HPP
-
 #include "../include/InertialDriver.h"
 #include <iostream>
 #include <stdexcept>
@@ -65,7 +62,7 @@ void InertialDriver::clear_buffer() {
 const Reading& InertialDriver::get_reading(int sensor_index) const {
     
     // Controllo validità input
-    if (sensor_index < 0 || sensor_index > 16) {
+    if (sensor_index < 0 || sensor_index > ( MEASURE_DIM - 1 ) ) {
         throw std::out_of_range("Errore: Indice lettura invalido");
     }
 
@@ -83,7 +80,7 @@ const Reading& InertialDriver::get_reading(int sensor_index) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const InertialDriver& driver) {
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < MEASURE_DIM; i++) {
         const Reading& temp = driver.get_reading(i);
 
         os << "[" << temp.pitch_a << "," << temp.pitch_v << "," 
@@ -91,11 +88,9 @@ std::ostream& operator<<(std::ostream& os, const InertialDriver& driver) {
            << temp.yaw_a << "," << temp.yaw_v << "]";
 
         // Virgola tra un valore e l'altro
-        if (i < 16) {
+        if (i < ( MEASURE_DIM - 1 ) ) {
             os << ", ";
         }
     }
     return os;
 }
-
-#endif
