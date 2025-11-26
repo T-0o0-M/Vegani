@@ -5,7 +5,8 @@
 #include <iostream>
 
 // Dimensione buffer arbitraria
-const int BUFFER_DIM=9; 
+const int BUFFER_DIM=9;
+const int MEASURE_DIM = 17;
 
 // Reading e' una singola lettura composta da 6 valori come double 
 struct Reading {
@@ -19,7 +20,7 @@ struct Reading {
 
 // Measure contiene un array stile C composto da 17 letture
 struct Measure {
-    Reading sensors[17]; 
+    Reading sensors[MEASURE_DIM]; 
 };
 
 class InertialDriver {
@@ -57,7 +58,5 @@ public:
     // Overload operator<< print misura più recente (non testato)
     friend std::ostream& operator<<(std::ostream& os, const InertialDriver& driver);
 };
-
-#include "../src/InertialDriver.hpp"
 
 #endif
