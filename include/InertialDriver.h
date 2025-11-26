@@ -62,4 +62,6 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const InertialDriver& driver);
 };
 
+#include "../src/InertialDriver.hpp"
+
 #endif

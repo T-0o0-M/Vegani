@@ -32,6 +32,6 @@ class myVector{
 		T *elem = nullptr;
 };
 
-#include "myVector.hpp"
+#include "../src/myVector.hpp"
 
 #endif
