@@ -6,6 +6,8 @@
 
 // Dimensione buffer arbitraria
 const int BUFFER_DIM=9; 
+// Dimensione array da consegna
+const int READING_DIM=17;
 
 // Reading e' una singola lettura composta da 6 valori come double 
 struct Reading {
@@ -19,7 +21,7 @@ struct Reading {
 
 // Measure contiene un array stile C composto da 17 letture
 struct Measure {
-    Reading sensors[17]; 
+    Reading sensors[READING_DIM]; 
 };
 
 class InertialDriver {
@@ -40,8 +42,10 @@ public:
     // Aggiunge una misura. Se il buffer è pieno, sovrascrive la misura più vecchia
     void push_back(const Measure& m);
 
-    // Restituisce e rimuove dal buffer la misura meno recente
-    Measure pop_front();
+    // Richiede un puntatore ad un array creato dall'utente,
+    // da cui copia dati della lettua meno recente e la rimuove dal buffer.
+    // L'utente finale ha il compito di allocare e gestire la memoria attraverso la costante READING_DIM
+    void pop_front(Reading* output_array);
 
     // setta il buffer vuoto
     void clear_buffer();

@@ -14,7 +14,7 @@ InertialDriver::InertialDriver() {
 
 // Aggiunge  una misura; se il buffer è pieno, sovrascrive la misura più vecchia
 void InertialDriver::push_back(const Measure& m) {
-    //se buffer vuoto, oldestMeasureIndex puntare già al più vecchio, spostare solo firstFreeIndex
+    //se buffer vuoto, allora oldestMeasureIndex punta già al più vecchio, perciò è sufficente spostare solo firstFreeIndex
     if( elem_count == 0 ){
         //Inserimento
         buffer[firstFreeIndex] = m;
@@ -41,23 +41,22 @@ void InertialDriver::push_back(const Measure& m) {
     }
 }
 // Fornisce e rimuove misura più vecchia
-Measure InertialDriver::pop_front() {
-    
-    //Controllo buffer vuoto
+void InertialDriver::pop_front(Reading* output_array) {
+    // Controllo buffer vuoto
     if (elem_count == 0) {
         throw std::out_of_range("Errore: Buffer vuoto");
     }
-    //Salvataggio del valore da restituire
-    Measure rtrn = buffer[oldestMeasureIndex];
-
-    //Avanzamento dell'indice più vecchio (wrap-around gestito dal modulo)
+    // Copia dei dati, copia i 17 elementi dall'oggetto Measure interno nel array esterno
+    for (int i = 0; i < 17; i++) {
+        // buffer[oldest...].sensors è l'array sorgente
+        // output_array è l'array di destinazione
+        output_array[i] = buffer[oldestMeasureIndex].sensors[i];
+    }
+    //Avanzamento dell'indice
     oldestMeasureIndex = (oldestMeasureIndex + 1) % BUFFER_DIM;
     
-    //Aggiornamento del conteggio
+    //Decremento conteggio
     elem_count--;
-    
-    //Ritorno del valore
-    return rtrn;
 }
 
  // Set buffer vuoto
