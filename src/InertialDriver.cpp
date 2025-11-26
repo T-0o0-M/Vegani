@@ -58,7 +58,7 @@ void InertialDriver::clear_buffer() {
 }
 
 
-// Correggi l'intestazione se necessario nel file .h
+// Dalla misura più recente, restituisce una delle 17 letture (composte da i 6 double).
 const Reading& InertialDriver::get_reading(int sensor_index) const {
     
     // Controllo validità input

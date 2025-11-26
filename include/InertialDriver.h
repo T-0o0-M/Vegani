@@ -51,8 +51,8 @@ public:
     void clear_buffer();
 
     // Dalla misura più recente, restituisce una delle 17 letture (composte da i 6 double).
-    // Se sensor_index è fuori dall'intervallo [0,16], il comportamento dipende dall'implementazione:
-    // può generare un'eccezione, restituire una lettura di default, o causare un errore di runtime.
+    // Se sensor_index è fuori dall'intervallo [0,16], genera un'eccezione:
+    // può generare un'eccezione out_of_range per buffer vuoto.
     const Reading& get_reading(int sensor_index) const;
 
     //funzione utilizzata per rapidamente incrementare gli indici
