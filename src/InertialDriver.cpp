@@ -30,13 +30,13 @@ void InertialDriver::push_back(const Measure& m) {
         elem_count++;
     }
 }
-// Fornisce e rimuove misura più vecchia
+// Fornisce e rimuove la misura più vecchia
 void InertialDriver::pop_front(Reading* output_array) {
     // Controllo buffer vuoto
     if (elem_count == 0) {
         throw std::out_of_range("Errore: Buffer vuoto");
     }
-    // Copia dei dati, copia i 17 elementi dall'oggetto Measure interno nel array esterno
+    // Copia dei dati, copia i 17 elementi dall'oggetto Measure interno nell'array esterno
     for (int i = 0; i < 17; i++) {
         // buffer[oldest...].sensors è l'array sorgente
         // output_array è l'array di destinazione
