@@ -12,23 +12,21 @@ InertialDriver::InertialDriver() {
     buffer.reserve(BUFFER_DIM);   
 }
 
-// Aggiunge  una misura; se il buffer è pieno, sovrascrive la misura più vecchia
+// Aggiunge una nuova misura, se il buffer è pieno, sovrascrive la più vecchia
 void InertialDriver::push_back(const Measure& m) {
-    // Se ill buffer è pieno. Sovrascrive l'elemento più vecchio (oldestMeasureIndex).
-    if (elem_count == BUFFER_DIM) {      
-        // Dopo la scrittura, l'indice più vecchio deve avanzare per puntare al nuovo elemento più vecchio. (Implementazione con %)
-        oldestMeasureIndex = (oldestMeasureIndex + 1) % BUFFER_DIM;
-    } 
-    //Inserimento
+    //Assegnamento
     buffer[firstFreeIndex] = m;
 
-    // Aggiornamento dell'indice di firstFreeIndex (Implementazione con %)
-    firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
-
-        // Aggiornamento del conteggio solo se buffer non e' gia' pieno
-    if (elem_count < BUFFER_DIM) {
+    //Se il buffer è pieno bisogna incrementare anche oldestMeasureIndex
+    if (elem_count == BUFFER_DIM) {
+        oldestMeasureIndex = (oldestMeasureIndex + 1) % BUFFER_DIM;
+    } else {
+        // Incrementa elem_count solo se il buffer non era pieno.
         elem_count++;
     }
+
+    // Incrementa sempre firstFreeIndex
+    firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
 }
 // Fornisce e rimuove la misura più vecchia
 void InertialDriver::pop_front(Reading* output_array) {

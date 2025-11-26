@@ -1,102 +1,127 @@
-#include "../include/InertialDriver.h"
 #include <iostream>
+#include <vector>
+#include "../include/InertialDriver.h"
 
-int main(){
-    InertialDriver d = InertialDriver();
+// --- FUNZIONE DI SUPPORTO ---
+// Crea una 'Measure' fittizia riempiendo tutti i sensori con un valore base
+Measure createDummyMeasure(double val) {
+    Measure m;
+    for (int i = 0; i < READING_DIM; i++) {
+        // Riempiamo i 6 campi della struct Reading con lo stesso valore 'val'
+        m.sensors[i] = {val, val, val, val, val, val}; 
+    }
+    return m;
+}
 
-    Reading r1;
-    r1.pitch_a = 1.2;
-    r1.pitch_v = 2.2;
-    r1.roll_a = -1.2;
-    r1.roll_v = 9.99;
-    r1.yaw_a = -10;
-    r1.yaw_v = 0;
-
-    Reading r2 = r1;
-    r2.pitch_v = 99.9;
-
-    Reading r3 = r1;
-    r3.roll_a = 99.9;
-
-    Reading r4 = r1;
-    r4.roll_v = 99.9;
-
-    Measure m1;
-    Measure m2;
-    Measure m3;
-    Measure m4;
-    Measure m5;
-    
-    for( int i = 0; i < MEASURE_DIM; i ++ ){
-        m1.sensors[ i ] = r1;
-        m2.sensors[ i ] = r2;
-        m3.sensors[ i ] = r3;
-        m4.sensors[ i ] = r4;
-        m5.sensors[ i ] = r1;
+int main() {
+    InertialDriver driver;
+    std::cout << "=== test ===" << std::endl;
+    // TEST 1: Controllo Errori su Buffer Vuoto
+    std::cout << "\n TEST 1: Verifica eccezioni su buffer vuoto" << std::endl;
+    try {
+        // Proviamo a leggere da un buffer appena creato (vuoto)
+        driver.get_reading(0);
+    } catch (const std::out_of_range& e) {
+        std::cout << "   -> Eccezione catturata correttamente: " << e.what() << std::endl;
     }
 
-    m5.sensors[ 1 ] = r2;
-    m5.sensors[ 2 ] = r3;
-    m5.sensors[ 3 ] = r4;
+    try {
+        Reading temp_array[READING_DIM];
+        // Proviamo a fare pop da vuoto
+        driver.pop_front(temp_array);
+    } catch (const std::out_of_range& e) {
+        std::cout << "   -> Eccezione catturata correttamente: " << e.what() << std::endl;
+    }
 
-    d.push_back( m1 );
-    Measure temp = d.pop_front();
+    // TEST 2: Inserimento e Lettura Recente (push_back; get_reading)
+    std::cout << "\n TEST 2: Inserimento misure..." << std::endl;
+    
+    Measure m1 = createDummyMeasure(1.1); // Misura "1.1"
+    Measure m2 = createDummyMeasure(2.2); // Misura "2.2"
+    
+    driver.push_back(m1);
+    std::cout << "   -> Inserita misura 1 (Valori 1.1)" << std::endl;
+    
+    driver.push_back(m2);
+    std::cout << "   -> Inserita misura 2 (Valori 2.2)" << std::endl;
 
-    std::cout << "first cout" << std::endl;
-    std::cout << temp.sensors[ 0 ].pitch_a << ", " << temp.sensors[ 0 ].pitch_v << ", " 
-            << temp.sensors[ 0 ].yaw_a << ", " << temp.sensors[ 0 ].yaw_v << ", " 
-            << temp.sensors[ 0 ].roll_a << ", " <<  temp.sensors[ 0 ].roll_v << std::endl;
+    // get_reading deve restituire l'ultima inserita (m2)
+    const Reading& r = driver.get_reading(0); // Leggiamo il sensore 0
+    if (r.pitch_a == 2.2) {
+        std::cout << "   -> OK: get_reading ha restituito l'elemento piu' recente (2.2)." << std::endl;
+    } else {
+        std::cout << "   -> Valore inatteso: " << r.pitch_a << std::endl;
+    }
 
-    d.push_back( m1 );
-    d.push_back( m2 );
-    d.push_back( m3 );
-    d.push_back( m4 );
-    d.push_back( m5 );
-    d.push_back( m1 );
-    d.push_back( m2 );
-    d.push_back( m3 );
-    d.push_back( m4 );
+    // TEST 3: Stampa Operator<<
+    std::cout << "\n TEST 3: operatore di stampa (ultima misura)..." << std::endl;
+    // dovrebe stampare i valori 2.2
+    std::cout << driver << std::endl; 
 
-    temp = d.pop_front();
 
-    d.push_back( m5 );
-    d.push_back( m5 );
-    d.push_back( m5 );
+    // TEST 4: Estrazione misura più vecchia (pop_front)
+    std::cout << "\n TEST 4: Rimozione misura vecchia (FIFO)..." << std::endl;
+    
+    // Nel buffer c'è: [Misura 1.1, Misura 2.2]
+    // La più vecchia è la 1.1 qundi pop_front deve restituire quella.
+    
+    Reading dati_estratti[READING_DIM]; // Array di destinazione
+    driver.pop_front(dati_estratti);
 
-    std::cout << "second cout" << std::endl;
-    std::cout << d << std::endl;
+    std::cout << "   -> Eseguito pop_front." << std::endl;
+    
+    // il primo sensore dell'array estratto deve essere 1.1
+    if (dati_estratti[0].pitch_a == 1.1) {
+        std::cout << "   -> Estratta correttamente la misura vecchia 1.1" << std::endl;
+    } else {
+        std::cout << "   -> Estratto valore errato: " << dati_estratti[0].pitch_a << std::endl;
+    }
 
-    d.push_back( m3 );
-    std::cout << "test cout" << std::endl;
-    std::cout << d << std::endl;
+    // Ora nel buffer rimane solo la 2.2. Se faccio un'altra pop, esce la 2.2.
+    driver.pop_front(dati_estratti);
+    if (dati_estratti[0].pitch_a == 2.2) {
+         std::cout << "   -> Estratta seconda misura (2.2). Buffer ora vuoto." << std::endl;
+    }
 
-    std::cout << "third cout" << std::endl;
-    std::cout << temp.sensors[ 1 ].pitch_a << ", " << temp.sensors[ 1 ].pitch_v << ", " 
-            << temp.sensors[ 1 ].yaw_a << ", " << temp.sensors[ 1 ].yaw_v << ", " 
-            << temp.sensors[ 1 ].roll_a << ", " <<  temp.sensors[ 1 ].roll_v << std::endl;
+    // TEST 5: Buffer circolare
+    std::cout << "\n[TEST 5] Riempimento e Sovrascrittura (Circular Buffer)..." << std::endl;
+    
+    // Riempiamo il buffer oltre la capacità (BUFFER_DIM + 5 elementi)
+    int num_writes = BUFFER_DIM + 5; 
+    std::cout << "   -> Scrivendo " << num_writes << " elementi..." << std::endl;
 
-    d.push_back( m1 );
-    d.push_back( m2 );
+    for (int i = 0; i < num_writes; i++) {
+        // Inseriamo valori crescenti: 100, 101, 102...
+        driver.push_back(createDummyMeasure((double)i));
+    }
 
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
-    d.pop_front();
+    // Abbiamo scritto indici da 0 a (BUFFER_DIM + 4).
+    // I primi 5 elementi (0, 1, 2, 3, 4) dovrebbero essere stati sovrascritti.
+    // L'elemento più vecchio disponibile ora dovrebbe essere l'indice 5.
+    Reading check_circular[READING_DIM];
+    driver.pop_front(check_circular);
 
-    d.push_back( m1 );
-    d.push_back( m2 );
-    d.push_back( m3 );
+    std::cout << "   -> pop_front dopo sovrascrittura. Valore atteso: 5.0" << std::endl;
+    std::cout << "   -> Valore ottenuto: " << check_circular[0].pitch_a << std::endl;
 
-    std::cout << "fourth cout" << std::endl;
-    std::cout << d << std::endl;
+    if (check_circular[0].pitch_a == 5.0) {
+        std::cout << "   -> OK: La logica circolare funziona. I vecchi dati sono stati sovrascritti." << std::endl;
+    } else {
+        std::cout << "   -> ERRORE: La logica circolare ha fallito." << std::endl;
+    }
 
-    d.clear_buffer();
-    d.pop_front();
 
+    // TEST 6: clear_buffer
+    std::cout << "\n TEST 6: Resettiamo il buffer" << std::endl;
+    driver.clear_buffer();
+    
+    try {
+        driver.get_reading(0);
+        std::cout << "   -> Il buffer dovrebbe essere vuoto!" << std::endl;
+    } catch (...) {
+        std::cout << "   -> Buffer svuotato correttamente" << std::endl;
+    }
+
+    std::cout << "\n FINSIH" << std::endl;
     return 0;
 }
