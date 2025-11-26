@@ -74,21 +74,22 @@ T myVector<T>::at( int pos ) const{
 
 template <typename T>
 void myVector<T>::push_back( T val ){
-	if( n >= max_size ){
-		T *temp = new T[ max_size * 2 ];
-		
-		for( int i = 0; i < max_size; i ++ ){
-			temp[ i ] = elem[ i ];
-		}
-		
-		max_size *= 2;
-		
-		delete[] elem;
-		elem = temp;
-	}
-	
-	elem[ n ] = val;
-	n++;
+    if( n >= max_size ){
+        int new_cap = (max_size == 0) ? 1 : max_size * 2;
+        T *temp = new T[ new_cap ];
+        
+        for( int i = 0; i < n; i ++ ){
+            temp[ i ] = std::move(elem[ i ]);
+        }
+        
+        if (max_size > 0) delete[] elem; 
+        
+        max_size = new_cap;
+        elem = temp;
+    }
+    
+    elem[ n ] = val;
+    n++;
 }
 
 template <typename T>
