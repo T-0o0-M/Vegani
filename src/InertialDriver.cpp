@@ -1,6 +1,3 @@
-#ifndef INERTIALDRIVER_HPP
-#define INERTIALDRIVER_HPP
-
 #include "../include/InertialDriver.h"
 #include <iostream>
 #include <stdexcept>
@@ -98,5 +95,3 @@ std::ostream& operator<<(std::ostream& os, const InertialDriver& driver) {
     }
     return os;
 }
-
-#endif
