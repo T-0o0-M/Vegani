@@ -35,9 +35,9 @@ void InertialDriver::push_back(const Measure& m) {
         firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
 
         // Aggiornamento del conteggio solo se buffer non e' gia' pieno
-        if (elem_count < BUFFER_DIM) {
-            elem_count++;
-        }
+    }
+    if (elem_count < BUFFER_DIM) {
+        elem_count++;
     }
 }
 // Fornisce e rimuove misura più vecchia
