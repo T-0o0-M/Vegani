@@ -14,20 +14,30 @@ InertialDriver::InertialDriver() {
 
 // Aggiunge  una misura; se il buffer è pieno, sovrascrive la misura più vecchia
 void InertialDriver::push_back(const Measure& m) {
-     // Se ill buffer è pieno. Sovrascrive l'elemento più vecchio (oldestMeasureIndex).
-    if (elem_count == BUFFER_DIM) {      
-        // Dopo la scrittura, l'indice più vecchio deve avanzare per puntare al nuovo elemento più vecchio. (Implementazione con %)
-        oldestMeasureIndex = (oldestMeasureIndex + 1) % BUFFER_DIM;
-    } 
-    //Inserimento
-    buffer[firstFreeIndex] = m;
+    //se buffer vuoto, oldestMeasureIndex puntare già al più vecchio, spostare solo firstFreeIndex
+    if( elem_count == 0 ){
+        //Inserimento
+        buffer[firstFreeIndex] = m;
 
-    // Aggiornamento dell'indice di firstFreeIndex (Implementazione con %)
-    firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
+        // Aggiornamento dell'indice di firstFreeIndex (Implementazione con %)
+        firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
+    }
+    else{
+        // Se ill buffer è pieno. Sovrascrive l'elemento più vecchio (oldestMeasureIndex).
+        if (elem_count == BUFFER_DIM) {      
+            // Dopo la scrittura, l'indice più vecchio deve avanzare per puntare al nuovo elemento più vecchio. (Implementazione con %)
+            oldestMeasureIndex = (oldestMeasureIndex + 1) % BUFFER_DIM;
+        } 
+        //Inserimento
+        buffer[firstFreeIndex] = m;
 
-    // Aggiornamento del conteggio solo se buffer non e' gia' pieno
-    if (elem_count < BUFFER_DIM) {
-        elem_count++;
+        // Aggiornamento dell'indice di firstFreeIndex (Implementazione con %)
+        firstFreeIndex = (firstFreeIndex + 1) % BUFFER_DIM;
+
+        // Aggiornamento del conteggio solo se buffer non e' gia' pieno
+        if (elem_count < BUFFER_DIM) {
+            elem_count++;
+        }
     }
 }
 // Fornisce e rimuove misura più vecchia
